@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rủ đi chơi</title>
+  <style>
+    :root {
+      --bg: #07070a;
+      --panel: rgba(13, 14, 20, 0.72);
+      --panel-strong: rgba(22, 24, 34, 0.92);
+      --text: #f5f7fb;
+      --muted: rgba(245, 247, 251, 0.72);
+      --pink: #ff5fa2;
+      --rose: #ff8dbb;
+      --gold: #ffd37a;
+      --mint: #7af0cc;
+      --line: rgba(255, 255, 255, 0.12);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 95, 162, 0.22), transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(122, 240, 204, 0.14), transparent 24%),
+        radial-gradient(circle at 50% 90%, rgba(255, 211, 122, 0.16), transparent 28%),
+        linear-gradient(180deg, #09090d 0%, #040406 100%);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .phone {
+      position: relative;
+      width: min(420px, 100%);
+      height: min(860px, calc(100vh - 36px));
+      border-radius: 34px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        linear-gradient(160deg, #120f18 0%, #09080c 48%, #050507 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .video {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), transparent 25%),
+        radial-gradient(circle at 50% 18%, rgba(255, 95, 162, 0.2), transparent 18%),
+        radial-gradient(circle at 30% 35%, rgba(122, 240, 204, 0.12), transparent 18%),
+        radial-gradient(circle at 70% 30%, rgba(255, 211, 122, 0.12), transparent 15%),
+        linear-gradient(180deg, #1b1322 0%, #0e0d15 45%, #07070a 100%);
+    }
+
+    .video::before,
+    .video::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border-radius: 50%;
+      filter: blur(18px);
+      opacity: 0.9;
+      animation: drift 10s ease-in-out infinite alternate;
+    }
+
+    .video::before {
+      width: 210px;
+      height: 210px;
+      top: 8%;
+      left: -32px;
+      background: rgba(255, 95, 162, 0.18);
+    }
+
+    .video::after {
+      width: 280px;
+      height: 280px;
+      bottom: -40px;
+      right: -60px;
+      background: rgba(122, 240, 204, 0.14);
+      animation-delay: -4s;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px);
+      background-size: 3px 3px;
+      mix-blend-mode: soft-light;
+    }
+
+    .topbar,
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      padding: 18px 16px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      color: var(--text);
+    }
+
+    .chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 0 5px rgba(255, 95, 162, 0.18);
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 35%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 66% 38%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 60%, #ffcfbf 0 7px, transparent 8px),
+        radial-gradient(circle at 50% 60%, rgba(0,0,0,0.16) 0 9px, transparent 10px),
+        linear-gradient(135deg, #ffb0d1 0%, #ff6f9c 45%, #ffd37a 100%);
+      border: 2px solid rgba(255,255,255,0.32);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      flex: none;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      max-width: 72%;
+    }
+
+    .profile .meta {
+      min-width: 0;
+    }
+
+    .name {
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .handle {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 78px 0 96px;
+      z-index: 2;
+      display: grid;
+      align-items: end;
+      padding: 0 16px;
+    }
+
+    .poster {
+      position: relative;
+      height: 100%;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 36%, rgba(255,255,255,0.16), transparent 18%),
+        radial-gradient(circle at 44% 42%, rgba(255, 95, 162, 0.16), transparent 12%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), transparent 28%),
+        linear-gradient(180deg, rgba(22, 18, 32, 0.75), rgba(5, 5, 8, 0.95));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .spotlight {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255, 211, 122, 0.18) 0%, rgba(255, 95, 162, 0.08) 36%, transparent 68%);
+      filter: blur(6px);
+      animation: pulse 5.5s ease-in-out infinite;
+    }
+
+    .couple {
+      position: absolute;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      width: min(320px, 84%);
+      height: 420px;
+      display: grid;
+      place-items: center;
+    }
+
+    .silhouette {
+      position: absolute;
+      width: 140px;
+      height: 240px;
+      bottom: 24px;
+      border-radius: 42px 42px 28px 28px;
+      background:
+        radial-gradient(circle at 50% 16%, rgba(255,255,255,0.85) 0 18px, transparent 19px),
+        radial-gradient(circle at 50% 38%, rgba(255,255,255,0.18) 0 44px, transparent 45px),
+        linear-gradient(180deg, rgba(255, 95, 162, 0.48), rgba(122, 240, 204, 0.2));
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.35));
+      opacity: 0.9;
+    }
+
+    .silhouette.left {
+      left: 34px;
+      transform: rotate(-8deg);
+    }
+
+    .silhouette.right {
+      right: 34px;
+      transform: rotate(8deg);
+      background:
+        radial-gradient(circle at 50% 16%, rgba(255,255,255,0.85) 0 18px, transparent 19px),
+        radial-gradient(circle at 50% 38%, rgba(255,255,255,0.18) 0 44px, transparent 45px),
+        linear-gradient(180deg, rgba(255, 211, 122, 0.48), rgba(255, 95, 162, 0.2));
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 18px;
+      color: #ffb4d0;
+      text-shadow: 0 0 16px rgba(255, 95, 162, 0.5);
+      animation: floatUp linear infinite;
+      opacity: 0.95;
+      user-select: none;
+    }
+
+    .caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 18px;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.18) 20%, rgba(0,0,0,0.72) 100%);
+    }
+
+    .caption h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 8vw, 44px);
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+    }
+
+    .caption p {
+      margin: 0;
+      max-width: 32ch;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .cta-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease, opacity 180ms ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), #ff7f72);
+      color: white;
+      box-shadow: 0 14px 32px rgba(255, 95, 162, 0.28);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(1px) scale(0.99); }
+
+    .footer {
+      bottom: 0;
+      display: grid;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .hint {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.72);
+      font-size: 12px;
+      pointer-events: auto;
+    }
+
+    .mini-note {
+      max-width: 70%;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 0 rgba(255, 211, 122, 0.5);
+      animation: ring 2.2s infinite;
+      flex: none;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      transform: translateX(-50%) translateY(-10px);
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      padding: 11px 14px;
+      border-radius: 999px;
+      background: rgba(17, 17, 23, 0.86);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      color: var(--text);
+      font-size: 13px;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .floating-btn {
+      position: absolute;
+      right: 16px;
+      bottom: 132px;
+      z-index: 4;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.3);
+      pointer-events: auto;
+    }
+
+    .floating-btn span {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(18px) scale(1.08); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+      50% { transform: translateX(-50%) scale(1.08); opacity: 1; }
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) scale(0.8); opacity: 0; }
+      10% { opacity: 0.95; }
+      to { transform: translateY(-260px) scale(1.2); opacity: 0; }
+    }
+
+    @keyframes ring {
+      0% { box-shadow: 0 0 0 0 rgba(255, 211, 122, 0.5); }
+      70% { box-shadow: 0 0 0 18px rgba(255, 211, 122, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 211, 122, 0); }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 0; }
+      .phone {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        border: 0;
+      }
+
+      .stage {
+        inset: 70px 0 88px;
+      }
+
+      .caption h1 {
+        font-size: clamp(28px, 8.5vw, 40px);
+      }
+
+      .caption p {
+        max-width: 100%;
+      }
+
+      .floating-btn {
+        bottom: 122px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="video"></div>
+    <div class="grain"></div>
+
+    <div class="toast" id="toast">Ok, chốt lịch đi chơi. Anh/chị chọn quán, em chọn người cười. </div>
+
+    <header class="topbar">
+      <div class="profile">
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="meta">
+          <div class="name">Cho người đặc biệt</div>
+          <div class="handle">@ngaybaygio?</div>
+        </div>
+      </div>
+
+      <div class="chip" aria-label="Mood hôm nay">
+        <span class="dot"></span>
+        Hôm nay: muốn rủ đi chơi
+      </div>
+    </header>
+
+    <section class="stage" aria-label="Lời mời đi chơi">
+      <div class="poster">
+        <div class="spotlight"></div>
+        <div class="couple" aria-hidden="true">
+          <div class="silhouette left"></div>
+          <div class="silhouette right"></div>
+        </div>
+
+        <div class="heart" style="left:18%; top:58%; animation-duration: 5.6s; animation-delay: 0s;">♥</div>
+        <div class="heart" style="left:74%; top:66%; animation-duration: 4.8s; animation-delay: 0.8s;">♥</div>
+        <div class="heart" style="left:62%; top:55%; animation-duration: 6.2s; animation-delay: 1.6s;">♥</div>
+        <div class="heart" style="left:28%; top:70%; animation-duration: 5.2s; animation-delay: 2.1s;">♥</div>
+
+        <div class="caption">
+          <h1>Đi chơi với anh nhé?</h1>
+          <p>
+            Anh không hứa sẽ làm em cười nhiều nhất thế giới,
+            nhưng anh hứa sẽ đi bên cạnh, mua đồ ăn ngon, và
+            không để em phải cầm đồ nặng.
+          </p>
+          <div class="cta-row">
+            <button class="btn-primary" id="yesBtn">Đi luôn</button>
+            <button class="btn-secondary" id="planBtn">Để anh lên kế hoạch</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <button class="floating-btn" id="heartBtn" aria-label="Thả tim">
+      <span>❤</span>
+    </button>
+
+    <footer class="footer">
+      <div class="hint">
+        <div class="mini-note">Gợi ý: mở trên điện thoại sẽ giống TikTok hơn.</div>
+        <div class="pulse-dot" aria-hidden="true"></div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const toast = document.getElementById('toast');
+    const yesBtn = document.getElementById('yesBtn');
+    const planBtn = document.getElementById('planBtn');
+    const heartBtn = document.getElementById('heartBtn');
+    const phone = document.querySelector('.phone');
+
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    function burstHearts(count = 10) {
+      const rect = phone.getBoundingClientRect();
+      for (let i = 0; i < count; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.textContent = ['♥', '❤', '💗'][i % 3];
+        heart.style.left = `${20 + Math.random() * 60}%`;
+        heart.style.top = `${55 + Math.random() * 20}%`;
+        heart.style.fontSize = `${14 + Math.random() * 12}px`;
+        heart.style.animationDuration = `${3.8 + Math.random() * 2.2}s`;
+        heart.style.animationDelay = `${Math.random() * 0.4}s`;
+        phone.appendChild(heart);
+        setTimeout(() => heart.remove(), 6000);
+      }
+    }
+
+    yesBtn.addEventListener('click', () => {
+      showToast('Chốt nhé. Anh đặt lịch, em chỉ cần xinh thôi.');
+      burstHearts(12);
+    });
+
+    planBtn.addEventListener('click', () => {
+      showToast('Kế hoạch: ăn ngon, cười nhiều, về nhà vẫn muốn gặp lại.');
+      burstHearts(8);
+    });
+
+    heartBtn.addEventListener('click', () => {
+      showToast('Thả tim xong thì cho anh một buổi hẹn luôn được không?');
+      burstHearts(14);
+    });
+  </script>
+</body>
+</html>
