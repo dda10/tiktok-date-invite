@@ -301,6 +301,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      align-items: center;
     }
 
     button {
@@ -325,6 +326,30 @@
       color: var(--text);
       border: 1px solid rgba(255,255,255,0.12);
       backdrop-filter: blur(10px);
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .no-btn {
+      min-width: 104px;
+      transform-origin: center;
+      will-change: transform, opacity;
+    }
+
+    .yes-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      animation: popIn 260ms ease-out;
     }
 
     button:hover { transform: translateY(-2px); }
@@ -433,6 +458,11 @@
       100% { box-shadow: 0 0 0 0 rgba(255, 211, 122, 0); }
     }
 
+    @keyframes popIn {
+      from { transform: scale(0.82); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
     @media (max-width: 480px) {
       body { padding: 0; }
       .phone {
@@ -498,25 +528,19 @@
         <div class="caption">
           <h1>Đi chơi với anh nhé?</h1>
           <p>
-            Anh không hứa sẽ làm em cười nhiều nhất thế giới,
-            nhưng anh hứa sẽ đi bên cạnh, mua đồ ăn ngon, và
-            không để em phải cầm đồ nặng.
+            Anh chỉ cho em 2 lựa chọn thôi. Nhưng thật ra, em bấm đúng số lần là anh tự biết phải chọn cái nào rồi.
           </p>
           <div class="cta-row">
-            <button class="btn-primary" id="yesBtn">Đi luôn</button>
-            <button class="btn-secondary" id="planBtn">Để anh lên kế hoạch</button>
+            <button class="btn-secondary no-btn" id="noBtn">Không</button>
+            <button class="btn-primary hidden" id="yesBtn">Có</button>
           </div>
         </div>
       </div>
     </section>
 
-    <button class="floating-btn" id="heartBtn" aria-label="Thả tim">
-      <span>❤</span>
-    </button>
-
     <footer class="footer">
       <div class="hint">
-        <div class="mini-note">Gợi ý: mở trên điện thoại sẽ giống TikTok hơn.</div>
+        <div class="mini-note">Gợi ý: cứ bấm `Không` đi, nó sẽ tự biết điều.</div>
         <div class="pulse-dot" aria-hidden="true"></div>
       </div>
     </footer>
@@ -524,12 +548,13 @@
 
   <script>
     const toast = document.getElementById('toast');
+    const noBtn = document.getElementById('noBtn');
     const yesBtn = document.getElementById('yesBtn');
-    const planBtn = document.getElementById('planBtn');
-    const heartBtn = document.getElementById('heartBtn');
     const phone = document.querySelector('.phone');
 
     let toastTimer;
+    let noClicks = 0;
+    let yesUnlocked = false;
 
     function showToast(message) {
       toast.textContent = message;
@@ -539,13 +564,12 @@
     }
 
     function burstHearts(count = 10) {
-      const rect = phone.getBoundingClientRect();
       for (let i = 0; i < count; i++) {
         const heart = document.createElement('div');
         heart.className = 'heart';
         heart.textContent = ['♥', '❤', '💗'][i % 3];
-        heart.style.left = `${20 + Math.random() * 60}%`;
-        heart.style.top = `${55 + Math.random() * 20}%`;
+        heart.style.left = `${30 + Math.random() * 40}%`;
+        heart.style.top = `${58 + Math.random() * 16}%`;
         heart.style.fontSize = `${14 + Math.random() * 12}px`;
         heart.style.animationDuration = `${3.8 + Math.random() * 2.2}s`;
         heart.style.animationDelay = `${Math.random() * 0.4}s`;
@@ -554,19 +578,37 @@
       }
     }
 
+    function updateNoButton() {
+      const scale = Math.max(0.28, 1 - noClicks * 0.13);
+      const offsetX = Math.min(44, noClicks * 7);
+      const offsetY = Math.min(18, noClicks * 3);
+      const rotation = Math.max(-8, 0 - noClicks * 0.8);
+      noBtn.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation}deg)`;
+      noBtn.style.opacity = `${Math.max(0.32, 1 - noClicks * 0.1)}`;
+    }
+
+    noBtn.addEventListener('click', () => {
+      noClicks += 1;
+
+      if (noClicks < 5) {
+        updateNoButton();
+        showToast('Không à? Để anh bấm thêm vài lần xem sao.');
+        return;
+      }
+
+      if (!yesUnlocked) {
+        yesUnlocked = true;
+        noBtn.classList.add('hidden');
+        yesBtn.classList.remove('hidden');
+        yesBtn.classList.add('yes-wrap');
+        showToast('Rồi, anh biết ý em rồi.');
+        burstHearts(10);
+      }
+    });
+
     yesBtn.addEventListener('click', () => {
-      showToast('Chốt nhé. Anh đặt lịch, em chỉ cần xinh thôi.');
-      burstHearts(12);
-    });
-
-    planBtn.addEventListener('click', () => {
-      showToast('Kế hoạch: ăn ngon, cười nhiều, về nhà vẫn muốn gặp lại.');
-      burstHearts(8);
-    });
-
-    heartBtn.addEventListener('click', () => {
-      showToast('Thả tim xong thì cho anh một buổi hẹn luôn được không?');
-      burstHearts(14);
+      showToast('Chốt nhé. Vậy mình đi chơi thôi.');
+      burstHearts(18);
     });
   </script>
 </body>
